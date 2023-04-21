@@ -25,6 +25,7 @@ CREATE TABLE ketoPilot.dietData
         dietLogID       INT             PRIMARY KEY     NOT NULL    AUTO_INCREMENT,
         accountNum      INT             REFERENCES customers (accountNum),
         dietDate        DATE            NOT NULL,
+        energyCalories  DECIMAL(9,2),
         carbGrams       DECIMAL(9,2),     
         fatGrams        DECIMAL(9,2),
         proteinGrams    DECIMAL(9,2)
@@ -32,63 +33,29 @@ CREATE TABLE ketoPilot.dietData
 
 CREATE TABLE ketoPilot.breathKetones
     (
-        BRKetoTestID    INT             PRIMARY KEY     NOT NULL    AUTO_INCREMENT,
+        BRKetoTestID    VARCHAR(50)     PRIMARY KEY     NOT NULL    AUTO_INCREMENT,
         accountNum      INT             REFERENCES customers (accountNum),
         brDate          DATE            NOT NULL,
-        acetoResult     DECIMAL(9,2)   
+        acetoResult     INT   
     );
 
 CREATE TABLE ketoPilot.bloodspotData
     (
-        BSTestID        INT             PRIMARY KEY     NOT NULL    AUTO_INCREMENT,
+        BSTestID        VARCHAR(50)     PRIMARY KEY     NOT NULL,
         accountNum      INT             REFERENCES customers (accountNum),
         bsDate          DATE            NOT NULL,
-        bhbResult       DECIMAL(9,2),
-        glucoseResult   DECIMAL(9,2),
-        gkiResult       DECIMAL(9,2)
+        bsTime          TIME,
+        bsAnalyte       VARCHAR(50)     NOT NULL,
+        bsTestResult    DECIMAL(9,2),
+        unit            VARCHAR(50),
+        gkiResult       DECIMAL(9,1)
     );
 
 CREATE TABLE ketoPilot.userProfiles
     (
         profileID       INT             PRIMARY KEY     NOT NULL    AUTO_INCREMENT,
         accountNum      INT             REFERENCES customers (accountNum),
-        dietLogID       INT             REFERENCES dietData (dietLogID),     
-        BSTestID        INT             REFERENCES bloodspotData (BSTestID),
-        BRKetoTestID    INT             REFERENCES breathKetones (BRKetoTestID)
+        dietLogID       VARCHAR(50)             REFERENCES dietData (dietLogID),     
+        BSTestID        VARCHAR(50)             REFERENCES bloodspotData (BSTestID),
+        BRKetoTestID    VARCHAR(50)             REFERENCES breathKetones (BRKetoTestID)
     );
-
-INSERT INTO customers VALUES
-    (DEFAULT,'michaeljchapman@students.abtech.edu','Chapman','Michael','Asheville','NC',28803,'USA'),
-    (DEFAULT,'madeup@students.abtech.edu','Donald','Ashley','Asheville','NC',28803,'USA');
-
-INSERT INTO accountSecurity VALUES
-    ('michaeljchapman@students.abtech.edu',(SELECT accountNum FROM customers WHERE email='michaeljchapman@students.abtech.edu'),'indiana',12345),
-    ('madeup@students.abtech.edu',(SELECT accountNum FROM customers WHERE email='madeup@students.abtech.edu'),'southcarolina',67890);
-
-
-
-    import csv
-import mysql.connector
-
-# Connect to MySQL database
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="yourusername",
-  password="yourpassword",
-  database="yourdatabase"
-)
-
-# Open the CSV file and read the data
-with open('data.csv', 'r') as file:
-    reader = csv.reader(file)
-    next(reader)  # skip header row
-    for row in reader:
-        date = row[0]
-        result = row[1]
-        
-        # Insert the data into the MySQL table
-        cursor = mydb.cursor()
-        sql = "INSERT INTO yourtable (date, result) VALUES (%s, %s)"
-        val = (date, result)
-        cursor.execute(sql, val)
-        mydb.commit()
